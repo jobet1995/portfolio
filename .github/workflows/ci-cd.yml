@@ -164,7 +164,7 @@ jobs:
     - name: Run Docker security scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ secrets.DOCKER_USERNAME }}/personal-portfolio:${{ github.sha }}
+        image-ref: ${{ secrets.DOCKER_USERNAME }}/personal-portfolio:master-${{ github.sha }}
         format: 'sarif'
         output: 'docker-trivy-results.sarif'
 
