@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, staging, production ]
   pull_request:
     branches: [ master ]
 
@@ -15,24 +15,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: test_wagtail
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_CHARSET: utf8mb4
-          MYSQL_COLLATION: utf8mb4_unicode_ci
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -56,17 +38,9 @@ jobs:
         pip install -r requirements.txt
         pip install pytest pytest-django coverage flake8 black isort autopep8
 
-
-    - name: Wait for MySQL
-      run: |
-        while ! mysqladmin ping -h 127.0.0.1 --silent; do
-          echo 'Waiting for MySQL...'
-          sleep 2
-        done
-
     - name: Run tests with coverage
       env:
-        DATABASE_URL: mysql://root:@127.0.0.1:3306/test_wagtail
+        DATABASE_URL: sqlite:///test_db.sqlite3
         SECRET_KEY: test-secret-key-for-ci
         DEBUG: False
         ALLOWED_HOSTS: localhost,127.0.0.1
