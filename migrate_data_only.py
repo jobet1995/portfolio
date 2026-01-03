@@ -6,10 +6,11 @@ This script migrates only data from SQLite to MySQL, skipping table creation.
 Usage: python migrate_data_only.py
 """
 
-import sqlite3
-import mysql.connector
 import os
+import sqlite3
 from pathlib import Path
+
+import mysql.connector
 
 
 # Load environment variables from .env file

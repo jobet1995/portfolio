@@ -6,10 +6,11 @@ This script migrates data from SQLite to MySQL without Django dependencies.
 Usage: python simple_migrate.py
 """
 
-import sqlite3
-import mysql.connector
 import os
+import sqlite3
 from pathlib import Path
+
+import mysql.connector
 
 
 # Load environment variables from .env file
