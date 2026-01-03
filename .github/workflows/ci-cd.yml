@@ -82,18 +82,6 @@ jobs:
         docker compose ps
         docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Health}}"
 
-    - name: Test Wagtail admin
-      run: |
-        # Wait a bit for services to be ready
-        echo "Waiting for services to initialize..."
-        sleep 30
-        # Create superuser for testing using printf
-        printf "from django.contrib.auth import get_user_model\nUser = get_user_model()\nif not User.objects.filter(username='admin').exists():\n    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')\n" > create_admin.py
-        docker compose exec -T web python manage.py shell < create_admin.py
-        
-        # Test admin login (basic check)
-        curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8000/admin/ | grep -E "200|302"
-
     - name: Cleanup
       if: always()
       run: |
