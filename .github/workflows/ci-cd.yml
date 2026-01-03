@@ -82,17 +82,11 @@ jobs:
         docker compose ps
         docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Health}}"
 
-    - name: Collect static files
+    - name: Test Wagtail admin
       run: |
         # Wait a bit for services to be ready
         echo "Waiting for services to initialize..."
         sleep 30
-        
-        # Collect static files
-        docker compose exec -T web python manage.py collectstatic --noinput --clear
-
-    - name: Test Wagtail admin
-      run: |
         # Create superuser for testing using printf
         printf "from django.contrib.auth import get_user_model\nUser = get_user_model()\nif not User.objects.filter(username='admin').exists():\n    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')\n" > create_admin.py
         docker compose exec -T web python manage.py shell < create_admin.py
