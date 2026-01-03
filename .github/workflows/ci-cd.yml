@@ -36,7 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-django coverage flake8 black isort autopep8
+        pip install coverage flake8 black isort autopep8
 
     - name: Run tests with coverage
       env:
@@ -45,12 +45,10 @@ jobs:
         DEBUG: False
         ALLOWED_HOSTS: localhost,127.0.0.1
       run: |
-        # Create pytest configuration for Django
-        printf "[tool:pytest]\nDJANGO_SETTINGS_MODULE = personal_portfolio.settings.dev\npython_files = tests.py test_*.py *_tests.py\ntestpaths = .\n" > pytest.ini
-        
-        # Run tests with coverage
-        python -m pytest --cov=. --cov-report=xml --cov-report=term -v
+        # Run Django tests with coverage
+        coverage run --source='.' manage.py test
         coverage xml
+        coverage report
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
