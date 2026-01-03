@@ -82,14 +82,11 @@ jobs:
         docker compose ps
         docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Health}}"
 
-    - name: Run Django migrations and tests
+    - name: Run Django tests
       run: |
         # Wait a bit for services to be ready
         echo "Waiting for services to initialize..."
         sleep 30
-        
-        # Run migrations
-        docker compose exec -T web python manage.py migrate --noinput
         
         # Run tests
         docker compose exec -T web python manage.py test
