@@ -45,9 +45,9 @@ jobs:
         DEBUG: False
         ALLOWED_HOSTS: localhost,127.0.0.1
       run: |
-        coverage run --source='.' manage.py test
+        # Discover and run all tests dynamically
+        python -m pytest --cov=. --cov-report=xml --cov-report=term
         coverage xml
-        coverage report
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
