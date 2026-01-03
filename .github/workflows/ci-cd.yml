@@ -75,20 +75,20 @@ jobs:
         printf "DEBUG=False\nSECRET_KEY=test-secret-key-for-ci\nDB_NAME=test_wagtail\nDB_USER=root\nDB_PASSWORD=\nDB_HOST=db\nDB_PORT=3306\nALLOWED_HOSTS=localhost,127.0.0.1,web\nEMAIL_HOST_URL=mailhog\nEMAIL_PORT=1025\nWEB_PORT=8000\nREDIS_PORT=6379\nMAILHOG_SMTP_PORT=1025\nMAILHOG_WEB_PORT=8025\n" > .env
         
         # Start services
-        docker-compose up -d --build
+        docker compose up -d --build
         
         # Wait for services to be ready
         echo "Waiting for services to start..."
         sleep 30
         
         # Check if services are running
-        docker-compose ps
+        docker compose ps
 
     - name: Run health checks
       run: |
         # Wait for database to be ready
         echo "Waiting for database..."
-        timeout 60 bash -c 'until docker-compose exec -T db mysqladmin ping -h localhost --silent; do sleep 2; done'
+        timeout 60 bash -c 'until docker compose exec -T db mysqladmin ping -h localhost --silent; do sleep 2; done'
         
         # Wait for web service
         echo "Waiting for web service..."
@@ -97,19 +97,19 @@ jobs:
     - name: Run Django migrations and tests
       run: |
         # Run migrations
-        docker-compose exec -T web python manage.py migrate --noinput
+        docker compose exec -T web python manage.py migrate --noinput
         
         # Run tests
-        docker-compose exec -T web python manage.py test
+        docker compose exec -T web python manage.py test
         
         # Collect static files
-        docker-compose exec -T web python manage.py collectstatic --noinput --clear
+        docker compose exec -T web python manage.py collectstatic --noinput --clear
 
     - name: Test Wagtail admin
       run: |
         # Create superuser for testing using printf
         printf "from django.contrib.auth import get_user_model\nUser = get_user_model()\nif not User.objects.filter(username='admin').exists():\n    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')\n" > create_admin.py
-        docker-compose exec -T web python manage.py shell < create_admin.py
+        docker compose exec -T web python manage.py shell < create_admin.py
         
         # Test admin login (basic check)
         curl -f -s -o /dev/null -w "%{http_code}" http://localhost:8000/admin/ | grep -E "200|302"
@@ -117,7 +117,7 @@ jobs:
     - name: Cleanup
       if: always()
       run: |
-        docker-compose down -v
+        docker compose down -v
         docker system prune -f
 
     - name: Upload logs on failure
@@ -126,7 +126,7 @@ jobs:
       with:
         name: docker-logs
         path: |
-          docker-compose logs
+          docker compose logs
         retention-days: 7
 
   # Security Scanning
