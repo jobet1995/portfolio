@@ -8,12 +8,13 @@ Usage: python create_user.py
 
 import os
 import sys
+from pathlib import Path
+
 import django
+import mysql.connector
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import connections, transaction
-import mysql.connector
-from pathlib import Path
 
 
 # Load environment variables from .env file
